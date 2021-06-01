@@ -1,0 +1,7 @@
+{
+	"name": "VanArsdelIR",
+	"properties": {
+		"type": "SelfHosted",
+		"description": "VanArsdel integration runtime"
+	}
+}
