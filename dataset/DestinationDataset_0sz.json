@@ -10,7 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileSystem": "forthscoffee"
+				"folderPath": "forthscoffee",
+				"fileSystem": "datalake"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
