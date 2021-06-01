@@ -13,6 +13,70 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_0sz')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "FourthCoffeeFS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ActorID",
+						"type": "String"
+					},
+					{
+						"name": "ActorName",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_djo')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "VanArsdelSqlServer",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_table": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().cw_table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SourceDataset_hg3')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -112,16 +176,18 @@
 				],
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_0sz')]"
+			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/VanArsdelCopyTask')]",
+			"name": "[concat(parameters('factoryName'), '/VanArsdelCopy')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "ForEach_hg3",
+						"name": "ForEach_djo",
 						"type": "ForEach",
 						"dependsOn": [],
 						"userProperties": [],
@@ -132,7 +198,7 @@
 							},
 							"activities": [
 								{
-									"name": "Copy_hg3",
+									"name": "Copy_djo",
 									"type": "Copy",
 									"dependsOn": [],
 									"policy": {
@@ -149,7 +215,7 @@
 										},
 										{
 											"name": "Destination",
-											"value": "vanarsdel//@{item().destination.fileName}"
+											"value": "datalake/vanarsdel/@{item().destination.fileName}"
 										}
 									],
 									"typeProperties": {
@@ -158,12 +224,14 @@
 											"partitionOption": "None"
 										},
 										"sink": {
-											"type": "ParquetSink",
+											"type": "DelimitedTextSink",
 											"storeSettings": {
 												"type": "AzureBlobFSWriteSettings"
 											},
 											"formatSettings": {
-												"type": "ParquetWriteSettings"
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
 											}
 										},
 										"enableStaging": false,
@@ -171,7 +239,7 @@
 									},
 									"inputs": [
 										{
-											"referenceName": "SourceDataset_hg3",
+											"referenceName": "SourceDataset_djo",
 											"type": "DatasetReference",
 											"parameters": {
 												"cw_table": "@item().source.table"
@@ -180,7 +248,7 @@
 									],
 									"outputs": [
 										{
-											"referenceName": "DestinationDataset_hg3",
+											"referenceName": "DestinationDataset_djo",
 											"type": "DatasetReference",
 											"parameters": {
 												"cw_fileName": "@item().destination.fileName"
@@ -201,7 +269,7 @@
 									"table": "Actors"
 								},
 								"destination": {
-									"fileName": "dboActors.parquet"
+									"fileName": "dboActors.txt"
 								}
 							},
 							{
@@ -209,7 +277,7 @@
 									"table": "Customers"
 								},
 								"destination": {
-									"fileName": "dboCustomers.parquet"
+									"fileName": "dboCustomers.txt"
 								}
 							},
 							{
@@ -217,7 +285,7 @@
 									"table": "MovieActors"
 								},
 								"destination": {
-									"fileName": "dboMovieActors.parquet"
+									"fileName": "dboMovieActors.txt"
 								}
 							},
 							{
@@ -225,7 +293,7 @@
 									"table": "Movies"
 								},
 								"destination": {
-									"fileName": "dboMovies.parquet"
+									"fileName": "dboMovies.txt"
 								}
 							},
 							{
@@ -233,7 +301,7 @@
 									"table": "OnlineMovieMappings"
 								},
 								"destination": {
-									"fileName": "dboOnlineMovieMappings.parquet"
+									"fileName": "dboOnlineMovieMappings.txt"
 								}
 							},
 							{
@@ -241,7 +309,7 @@
 									"table": "Transactions"
 								},
 								"destination": {
-									"fileName": "dboTransactions.parquet"
+									"fileName": "dboTransactions.txt"
 								}
 							}
 						]
@@ -250,7 +318,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SourceDataset_hg3')]"
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_djo')]"
 			]
 		}
 	]
