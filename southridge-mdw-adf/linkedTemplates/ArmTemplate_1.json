@@ -21,6 +21,9 @@
 					"referenceName": "FourthCoffeeFS",
 					"type": "LinkedServiceReference"
 				},
+				"folder": {
+					"name": "Ingest"
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
@@ -63,6 +66,9 @@
 						"type": "String"
 					}
 				},
+				"folder": {
+					"name": "Ingest"
+				},
 				"annotations": [],
 				"type": "SqlServerTable",
 				"schema": [],
@@ -89,6 +95,9 @@
 					"cw_table": {
 						"type": "String"
 					}
+				},
+				"folder": {
+					"name": "Ingest"
 				},
 				"annotations": [],
 				"type": "SqlServerTable",
@@ -174,6 +183,9 @@
 						]
 					}
 				],
+				"folder": {
+					"name": "Ingest"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -314,6 +326,9 @@
 							}
 						]
 					}
+				},
+				"folder": {
+					"name": "Ingest"
 				},
 				"annotations": []
 			},
