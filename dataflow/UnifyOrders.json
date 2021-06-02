@@ -1,0 +1,40 @@
+{
+	"name": "UnifyOrders",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SouthridgeOrdersSourceDataset",
+						"type": "DatasetReference"
+					},
+					"name": "SouthridgeOrdersOutputStream"
+				},
+				{
+					"dataset": {
+						"referenceName": "SouthridgeOrderDetailsSourceDataset",
+						"type": "DatasetReference"
+					},
+					"name": "SouthridgeOrderDetailsOutputStream"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "JoinOrdersWithOrderDetails"
+				},
+				{
+					"name": "SelectOrderColumns"
+				},
+				{
+					"name": "SelectOrderDetails"
+				},
+				{
+					"name": "DerivedColumn1"
+				}
+			],
+			"script": "source(output(\n\t\tOrderID as string,\n\t\tCustomerID as string,\n\t\tOrderDate as date,\n\t\tShipDate as date,\n\t\tTotalCost as decimal(19,4),\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SouthridgeOrdersOutputStream\nsource(output(\n\t\tOrderDetailID as string,\n\t\tOrderID as string,\n\t\tMovieID as string,\n\t\tQuantity as integer,\n\t\tUnitCost as decimal(19,4),\n\t\tLineNumber as integer,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SouthridgeOrderDetailsOutputStream\nSelectOrderColumns, SelectOrderDetails join(SelectOrderColumns@OrderID == OrdeID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinOrdersWithOrderDetails\nSouthridgeOrdersOutputStream select(mapColumn(\n\t\tOrderID,\n\t\tCustomerID,\n\t\tOrderDate,\n\t\tTotalCost,\n\t\tCreatedDate,\n\t\tUpdatedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectOrderColumns\nSouthridgeOrderDetailsOutputStream select(mapColumn(\n\t\tOrderID,\n\t\tCreatedDate,\n\t\tUpdatedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectOrderDetails\nJoinOrdersWithOrderDetails derive(Source = \"Southridge\") ~> DerivedColumn1"
+		}
+	}
+}
