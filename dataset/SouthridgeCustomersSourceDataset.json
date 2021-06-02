@@ -5,6 +5,9 @@
 			"referenceName": "AzureDataLakeStorageGen2",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "unified"
+		},
 		"annotations": [],
 		"type": "Parquet",
 		"typeProperties": {
@@ -18,19 +21,31 @@
 		},
 		"schema": [
 			{
+				"name": "AddressID",
+				"type": "UTF8"
+			},
+			{
 				"name": "CustomerID",
 				"type": "UTF8"
 			},
 			{
-				"name": "LastName",
+				"name": "AddressLine1",
 				"type": "UTF8"
 			},
 			{
-				"name": "FirstName",
+				"name": "AddressLine2",
 				"type": "UTF8"
 			},
 			{
-				"name": "PhoneNumber",
+				"name": "City",
+				"type": "UTF8"
+			},
+			{
+				"name": "State",
+				"type": "UTF8"
+			},
+			{
+				"name": "ZipCode",
 				"type": "UTF8"
 			},
 			{
