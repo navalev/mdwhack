@@ -5,6 +5,9 @@
 			"referenceName": "MoviesDB",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "Ingest"
+		},
 		"annotations": [],
 		"type": "CosmosDbSqlApiCollection",
 		"schema": {

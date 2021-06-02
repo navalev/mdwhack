@@ -5,6 +5,9 @@
 			"referenceName": "FourthCoffeeFS",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "Ingest"
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
