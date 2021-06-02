@@ -85,9 +85,6 @@
 					"FourthCoffeeFS_password": {
 						"value": "[parameters('FourthCoffeeFS_password')]"
 					},
-					"VanArsdelSqlServer_connectionString": {
-						"value": "[parameters('VanArsdelSqlServer_connectionString')]"
-					},
 					"AzureDataLakeStorageGen2_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorageGen2_properties_typeProperties_url')]"
 					},
@@ -114,6 +111,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"VanArsdelSqlServer_connectionString": {
+						"value": "[parameters('VanArsdelSqlServer_connectionString')]"
 					}
 				}
 			},
