@@ -1,5 +1,5 @@
 {
-	"name": "UnifiedCustomersDataset",
+	"name": "vanarsdelCustomersDataSet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureDataLakeStorageGen2",
@@ -9,14 +9,18 @@
 			"name": "unified"
 		},
 		"annotations": [],
-		"type": "Parquet",
+		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "customers",
-				"fileSystem": "staging"
+				"fileName": "dboCustomers.txt",
+				"folderPath": "vanarsdel",
+				"fileSystem": "datalake"
 			},
-			"compressionCodec": "snappy"
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
 		},
 		"schema": []
 	}
