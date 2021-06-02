@@ -1,9 +1,9 @@
 {
-	"name": "pipeline1",
+	"name": "CustomerUnificationPeipeline",
 	"properties": {
 		"activities": [
 			{
-				"name": "CustomersUnificationPipeline",
+				"name": "CustomersUnificationDataFlow",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
