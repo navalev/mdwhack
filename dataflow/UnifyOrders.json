@@ -17,6 +17,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "SourcebridgeOrderDetailsOutputStream"
+				},
+				{
+					"dataset": {
+						"referenceName": "ForthCoffeeTransactionSourceDataset",
+						"type": "DatasetReference"
+					},
+					"name": "ForthCoffeeTransactionsSourceDataset"
 				}
 			],
 			"sinks": [
@@ -37,9 +44,18 @@
 				},
 				{
 					"name": "AddColumns"
+				},
+				{
+					"name": "ForthCoffeeAddColumns"
+				},
+				{
+					"name": "ForthCoffeeSelectColumns"
+				},
+				{
+					"name": "Union"
 				}
 			],
-			"script": "source(output(\n\t\tOrderID as string,\n\t\tCustomerID as string,\n\t\tOrderDate as date,\n\t\tShipDate as date,\n\t\tTotalCost as decimal(19,4),\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SoutchridgeOrdersOutputStream\nsource(output(\n\t\tOrderDetailID as string,\n\t\tOrderID as string,\n\t\tMovieID as string,\n\t\tQuantity as integer,\n\t\tUnitCost as decimal(19,4),\n\t\tLineNumber as integer,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SourcebridgeOrderDetailsOutputStream\nSoutchridgeOrdersOutputStream, SourcebridgeOrderDetailsOutputStream join(SoutchridgeOrdersOutputStream@OrderID == SourcebridgeOrderDetailsOutputStream@OrderID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinOrdersAndDetails\nJoinOrdersAndDetails select(mapColumn(\n\t\tOrderID = SoutchridgeOrdersOutputStream@OrderID,\n\t\tCustomerID,\n\t\tRentalDate = OrderDate,\n\t\tTotalCost,\n\t\tCreatedDate = SoutchridgeOrdersOutputStream@CreatedDate,\n\t\tUpdatedDate = SoutchridgeOrdersOutputStream@UpdatedDate,\n\t\tMovieID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectOrdersColumns\nSelectOrdersColumns derive(Source = 'Southridge') ~> AddColumns\nAddColumns sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> UnifiedOrders"
+			"script": "source(output(\n\t\tOrderID as string,\n\t\tCustomerID as string,\n\t\tOrderDate as date,\n\t\tShipDate as date,\n\t\tTotalCost as decimal(19,4),\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SoutchridgeOrdersOutputStream\nsource(output(\n\t\tOrderDetailID as string,\n\t\tOrderID as string,\n\t\tMovieID as string,\n\t\tQuantity as integer,\n\t\tUnitCost as decimal(19,4),\n\t\tLineNumber as integer,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SourcebridgeOrderDetailsOutputStream\nsource(output(\n\t\tTransactionID as string,\n\t\tCustomerID as string,\n\t\tMovieID as string,\n\t\tRentalDate as string,\n\t\tReturnDate as string,\n\t\tRentalCost as string,\n\t\tLateFee as string,\n\t\tRewindFlag as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false) ~> ForthCoffeeTransactionsSourceDataset\nSoutchridgeOrdersOutputStream, SourcebridgeOrderDetailsOutputStream join(SoutchridgeOrdersOutputStream@OrderID == SourcebridgeOrderDetailsOutputStream@OrderID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinOrdersAndDetails\nJoinOrdersAndDetails select(mapColumn(\n\t\tOrderID = SoutchridgeOrdersOutputStream@OrderID,\n\t\tCustomerID,\n\t\tRentalDate = OrderDate,\n\t\tTotalCost,\n\t\tCreatedDate = SoutchridgeOrdersOutputStream@CreatedDate,\n\t\tUpdatedDate = SoutchridgeOrdersOutputStream@UpdatedDate,\n\t\tMovieID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectOrdersColumns\nSelectOrdersColumns derive(Source = 'Southridge') ~> AddColumns\nForthCoffeeTransactionsSourceDataset derive(TotalCost = toDouble(RentalCost) + toDouble(LateFee),\n\t\tSource = \"ForthCoffee\",\n\t\tRentalDate = toDate(RentalDate),\n\t\tReturnDate = toDate(ReturnDate),\n\t\tCreatedDate = toDate(CreatedDate),\n\t\tUpdatedDate = toDate(UpdatedDate)) ~> ForthCoffeeAddColumns\nForthCoffeeAddColumns select(mapColumn(\n\t\tOrderID = TransactionID,\n\t\tCustomerID,\n\t\tMovieID,\n\t\tRentalDate,\n\t\tReturnDate,\n\t\tRewindFlag,\n\t\tCreatedDate,\n\t\tUpdatedDate,\n\t\tTotalCost,\n\t\tSource\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> ForthCoffeeSelectColumns\nAddColumns, ForthCoffeeSelectColumns union(byName: true)~> Union\nUnion sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> UnifiedOrders"
 		}
 	}
 }
