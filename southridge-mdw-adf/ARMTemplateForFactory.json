@@ -723,6 +723,7 @@
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
+					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
 				"schema": []
@@ -827,6 +828,7 @@
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
+					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
 				"schema": []
@@ -882,7 +884,8 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileSystem": "movies"
+						"folderPath": "movies",
+						"fileSystem": "datalake"
 					},
 					"compressionCodec": "snappy",
 					"columnDelimiter": ",",
