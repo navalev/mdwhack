@@ -1,0 +1,45 @@
+{
+	"name": "UnifyOrders",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SoutchridgeOrdersSourceDataSet",
+						"type": "DatasetReference"
+					},
+					"name": "SoutchridgeOrdersOutputStream"
+				},
+				{
+					"dataset": {
+						"referenceName": "SouthridgeOrderDetailsSourceDataSet",
+						"type": "DatasetReference"
+					},
+					"name": "SourcebridgeOrderDetailsOutputStream"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "UnifiedOrdersDataset",
+						"type": "DatasetReference"
+					},
+					"name": "UnifiedOrders"
+				}
+			],
+			"transformations": [
+				{
+					"name": "JoinOrdersAndDetails"
+				},
+				{
+					"name": "SelectOrdersColumns"
+				},
+				{
+					"name": "AddColumns"
+				}
+			],
+			"script": "source(output(\n\t\tOrderID as string,\n\t\tCustomerID as string,\n\t\tOrderDate as date,\n\t\tShipDate as date,\n\t\tTotalCost as decimal(19,4),\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SoutchridgeOrdersOutputStream\nsource(output(\n\t\tOrderDetailID as string,\n\t\tOrderID as string,\n\t\tMovieID as string,\n\t\tQuantity as integer,\n\t\tUnitCost as decimal(19,4),\n\t\tLineNumber as integer,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SourcebridgeOrderDetailsOutputStream\nSoutchridgeOrdersOutputStream, SourcebridgeOrderDetailsOutputStream join(SoutchridgeOrdersOutputStream@OrderID == SourcebridgeOrderDetailsOutputStream@OrderID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinOrdersAndDetails\nJoinOrdersAndDetails select(mapColumn(\n\t\tOrderID = SoutchridgeOrdersOutputStream@OrderID,\n\t\tCustomerID,\n\t\tRentalDate = OrderDate,\n\t\tTotalCost,\n\t\tCreatedDate = SoutchridgeOrdersOutputStream@CreatedDate,\n\t\tUpdatedDate = SoutchridgeOrdersOutputStream@UpdatedDate,\n\t\tMovieID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectOrdersColumns\nSelectOrdersColumns derive(Source = 'Southridge') ~> AddColumns\nAddColumns sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> UnifiedOrders"
+		}
+	}
+}
