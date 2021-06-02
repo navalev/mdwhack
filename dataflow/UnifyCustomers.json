@@ -23,9 +23,15 @@
 			"transformations": [
 				{
 					"name": "SouthridgeCustomersAddressesJoinOutputStream"
+				},
+				{
+					"name": "SouthridgeCustomerDatesColumnRename"
+				},
+				{
+					"name": "SouthridgeAddressesRenamedDates"
 				}
 			],
-			"script": "source(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SouthridgeCustomersOutputStream\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SouthridgeAddressesOutputStream\nSouthridgeCustomersOutputStream, SouthridgeAddressesOutputStream join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),\n\tjoinType:'left',\n\tbroadcast: 'auto')~> SouthridgeCustomersAddressesJoinOutputStream"
+			"script": "source(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SouthridgeCustomersOutputStream\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SouthridgeAddressesOutputStream\nSouthridgeCustomerDatesColumnRename, SouthridgeAddressesOutputStream join(SouthridgeCustomerDatesColumnRename@CustomerID == SouthridgeAddressesOutputStream@CustomerID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> SouthridgeCustomersAddressesJoinOutputStream\nSouthridgeCustomersOutputStream select(mapColumn(\n\t\tCustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tCustomerCreatedDate = CreatedDate,\n\t\tCustomerUpdatedDate = UpdatedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SouthridgeCustomerDatesColumnRename\nSouthridgeAddressesOutputStream select(mapColumn(\n\t\tAddressID,\n\t\tCustomerID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode,\n\t\tAddressCreatedDate = CreatedDate,\n\t\tAddressUpdatedDate = UpdatedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SouthridgeAddressesRenamedDates"
 		}
 	}
 }
