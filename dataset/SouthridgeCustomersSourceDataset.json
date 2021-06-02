@@ -21,31 +21,19 @@
 		},
 		"schema": [
 			{
-				"name": "AddressID",
-				"type": "UTF8"
-			},
-			{
 				"name": "CustomerID",
 				"type": "UTF8"
 			},
 			{
-				"name": "AddressLine1",
+				"name": "LastName",
 				"type": "UTF8"
 			},
 			{
-				"name": "AddressLine2",
+				"name": "FirstName",
 				"type": "UTF8"
 			},
 			{
-				"name": "City",
-				"type": "UTF8"
-			},
-			{
-				"name": "State",
-				"type": "UTF8"
-			},
-			{
-				"name": "ZipCode",
+				"name": "PhoneNumber",
 				"type": "UTF8"
 			},
 			{
