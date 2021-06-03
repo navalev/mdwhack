@@ -1,5 +1,5 @@
 {
-	"name": "SouthridgeCustomersSourceDataset",
+	"name": "SouthridgeOrderDetailsSourceDataset",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureDataLakeStorageGen2",
@@ -13,7 +13,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "dboCustomers.parquet",
+				"fileName": "dboOrderDetails.parquet",
 				"folderPath": "sales",
 				"fileSystem": "datalake"
 			},
@@ -21,20 +21,30 @@
 		},
 		"schema": [
 			{
-				"name": "CustomerID",
+				"name": "OrderDetailID",
 				"type": "UTF8"
 			},
 			{
-				"name": "LastName",
+				"name": "OrderID",
 				"type": "UTF8"
 			},
 			{
-				"name": "FirstName",
+				"name": "MovieID",
 				"type": "UTF8"
 			},
 			{
-				"name": "PhoneNumber",
-				"type": "UTF8"
+				"name": "Quantity",
+				"type": "INT32"
+			},
+			{
+				"name": "UnitCost",
+				"type": "DECIMAL",
+				"precision": 19,
+				"scale": 4
+			},
+			{
+				"name": "LineNumber",
+				"type": "INT32"
 			},
 			{
 				"name": "CreatedDate",
